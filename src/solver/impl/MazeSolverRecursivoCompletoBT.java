@@ -9,13 +9,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Implementación de un algoritmo recursivo que busca en las 4 direcciones.
+ * Implementación de un algoritmo recursivo con backtracking explícito.
  *
- * Esta versión es más completa que la anterior, ya que puede encontrar cualquier
- * camino que no requiera pasar dos veces por la misma celda. Sigue usando
- * backtracking implícito al retornar 'false' cuando un camino no lleva a la solución.
+ * Esta es la versión más robusta de los algoritmos recursivos. Si un camino
+ * resulta ser un callejón sin salida, la función no solo retorna 'false',
+ * sino que también "limpia su rastro", desmarcando la celda actual del arreglo
+ * 'visited'. Esto permite que la celda pueda ser utilizada por otra ruta
+ * potencial en el futuro de la exploración.
  */
-public class MazeSolverRecursivoCompleto implements MazeSolver {
+public class MazeSolverRecursivoCompletoBT implements MazeSolver {
 
     private Cell[][] maze;
     private boolean[][] visited;
@@ -43,6 +45,7 @@ public class MazeSolverRecursivoCompleto implements MazeSolver {
             return false;
         }
 
+        // Marcamos la celda como parte del camino potencial ACTUAL
         visited[row][col] = true;
         Cell current = maze[row][col];
 
@@ -52,32 +55,20 @@ public class MazeSolverRecursivoCompleto implements MazeSolver {
         }
 
         // --- PASO RECURSIVO (4 DIRECCIONES) ---
+        int[] dr = {1, -1, 0, 0}; // Abajo, Arriba
+        int[] dc = {0, 0, 1, -1}; // Derecha, Izquierda
 
-        // Intentamos movernos hacia ABAJO
-        if (findPath(row + 1, col, end)) {
-            path.add(0, current);
-            return true;
+        for (int i = 0; i < 4; i++) {
+            if (findPath(row + dr[i], col + dc[i], end)) {
+                path.add(0, current); // Si se encontró un camino, nos añadimos y retornamos éxito
+                return true;
+            }
         }
 
-        // Intentamos movernos hacia ARRIBA
-        if (findPath(row - 1, col, end)) {
-            path.add(0, current);
-            return true;
-        }
-
-        // Intentamos movernos hacia la DERECHA
-        if (findPath(row, col + 1, end)) {
-            path.add(0, current);
-            return true;
-        }
-
-        // Intentamos movernos hacia la IZQUIERDA
-        if (findPath(row, col - 1, end)) {
-            path.add(0, current);
-            return true;
-        }
-
-        // Si ninguna dirección funcionó, devolvemos false.
+        // Si después de probar las 4 direcciones ninguna llevó a la solución,
+        // significa que esta celda es un callejón sin salida.
+        // La desmarcamos para que pueda ser usada por otra ruta.
+        visited[row][col] = false;
         return false;
     }
 }
