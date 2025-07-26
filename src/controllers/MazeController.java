@@ -2,10 +2,10 @@ package controllers;
 
 import models.Cell;
 import models.CellState;
-import models.MazeGenerator; // ¡Importante! Necesitas crear esta clase.
+import models.MazeGenerator; 
 import solver.MazeSolver;
 import solver.impl.MazeSolverBFS;
-import solver.impl.MazeSolverDFS; // Asumo que tienes una clase MazeSolverDFS similar a la de BFS.
+import solver.impl.MazeSolverDFS; 
 import views.MazeFrame;
 
 import javax.swing.JOptionPane;
@@ -42,8 +42,6 @@ public class MazeController implements ActionListener {
                     view.getMazePanel().clearSolution();
                 }
                 
-                // --- ¡ACCIÓN REQUERIDA! ---
-                // Debes crear la clase 'MazeGenerator' para que esta línea funcione.
                 currentMaze = MazeGenerator.generate(getSelectedSize());
                 
                 view.getMazePanel().setMaze(currentMaze);
@@ -79,7 +77,7 @@ public class MazeController implements ActionListener {
             return;
         }
         
-        view.getMazePanel().clearSolution(); // Limpia el camino anterior si existe
+        view.getMazePanel().clearSolution(); 
 
         Cell start = findCell(currentMaze, CellState.START);
         Cell end = findCell(currentMaze, CellState.END);

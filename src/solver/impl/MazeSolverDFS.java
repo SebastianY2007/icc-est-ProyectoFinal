@@ -4,88 +4,89 @@ import models.Cell;
 import models.CellState;
 import solver.MazeSolver;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Implementación del algoritmo de Búsqueda en Profundidad (Depth-First Search) para resolver el laberinto.
- *
- * DFS explora tan profundo como sea posible a lo largo de cada rama antes de retroceder.
- * Utiliza una Pila (Stack) para llevar un registro de las celdas a visitar (LIFO - Last In, First Out).
- * Generalmente encuentra una solución más rápido que BFS, pero no garantiza que sea la ruta más corta.
+ * Implementación del algoritmo de Búsqueda en Profundidad (DFS) utilizando un enfoque recursivo.
+ * La pila de llamadas de la función reemplaza la necesidad de una estructura de datos Stack explícita.
  */
 public class MazeSolverDFS implements MazeSolver {
 
     @Override
     public List<Cell> solve(Cell[][] maze, Cell start, Cell end) {
-        // 1. Estructuras de Datos
-        // Pila para las celdas pendientes de visitar (comportamiento LIFO)
-        Stack<Cell> stack = new Stack<>();
-        // Mapa para reconstruir el camino. Guarda: <Hijo, Padre>
-        Map<Cell, Cell> parentMap = new HashMap<>();
-        // Matriz para marcar celdas visitadas
+        // Estructuras de datos para el seguimiento
         boolean[][] visited = new boolean[maze.length][maze[0].length];
+        Map<Cell, Cell> parentMap = new HashMap<>();
 
-        // 2. Inicialización
-        // Empezamos la búsqueda desde la celda de inicio
-        stack.push(start);
-        visited[start.getRow()][start.getCol()] = true;
+        // Inicia la búsqueda recursiva desde el punto de partida
+        boolean found = findPathRecursive(maze, start, end, visited, parentMap);
 
-        Cell current = null;
-        boolean found = false;
-
-        // 3. Bucle Principal de Búsqueda
-        while (!stack.isEmpty()) {
-            current = stack.pop(); // Sacamos el último elemento añadido a la pila
-
-            // Si hemos llegado al final, terminamos la búsqueda
-            if (current.equals(end)) {
-                found = true;
-                break;
-            }
-
-            // 4. Explorar Vecinos (Arriba, Abajo, Izquierda, Derecha)
-            int[] dr = {-1, 1, 0, 0}; // Cambios en las filas
-            int[] dc = {0, 0, -1, 1}; // Cambios en las columnas
-
-            for (int i = 0; i < 4; i++) {
-                int newRow = current.getRow() + dr[i];
-                int newCol = current.getCol() + dc[i];
-
-                // Si el vecino es una celda válida...
-                if (isValid(maze, visited, newRow, newCol)) {
-                    visited[newRow][newCol] = true; // La marcamos como visitada
-                    Cell neighbor = maze[newRow][newCol];
-                    parentMap.put(neighbor, current); // Guardamos quién es su padre
-                    stack.push(neighbor); // La añadimos a la pila para visitarla después
-                }
-            }
-        }
-
-        // 5. Reconstrucción del Camino
+        // Si se encontró un camino, reconstrúyelo. De lo contrario, devuelve una lista vacía.
         if (found) {
             return reconstructPath(parentMap, start, end);
         }
-
         return Collections.emptyList();
     }
 
     /**
+     * El método recursivo principal que busca un camino.
+     * @return true si se encuentra un camino desde 'current' hasta 'end', false en caso contrario.
+     */
+    private boolean findPathRecursive(Cell[][] maze, Cell current, Cell end, boolean[][] visited, Map<Cell, Cell> parentMap) {
+        // Caso base de éxito: hemos llegado al final.
+        if (current.equals(end)) {
+            return true;
+        }
+
+        // Marca la celda actual como visitada.
+        visited[current.getRow()][current.getCol()] = true;
+
+        // Explora los vecinos.
+        int[] dr = {-1, 1, 0, 0}; // Cambios en las filas
+        int[] dc = {0, 0, -1, 1}; // Cambios en las columnas
+
+        for (int i = 0; i < 4; i++) {
+            int newRow = current.getRow() + dr[i];
+            int newCol = current.getCol() + dc[i];
+
+            if (isValid(maze, visited, newRow, newCol)) {
+                Cell neighbor = maze[newRow][newCol];
+                parentMap.put(neighbor, current); // Guarda el camino
+
+                // Llama recursivamente para el vecino.
+                // Si la llamada encuentra el final, propaga el éxito hacia arriba.
+                if (findPathRecursive(maze, neighbor, end, visited, parentMap)) {
+                    return true;
+                }
+            }
+        }
+
+        // Caso base de fallo: ningún vecino desde 'current' conduce a la solución.
+        return false;
+    }
+
+    /**
      * Verifica si una celda en una posición dada es un movimiento válido.
-     * (Este método es idéntico al de BFS)
      */
     private boolean isValid(Cell[][] maze, boolean[][] visited, int row, int col) {
+        // ¿Está dentro de los límites?
         if (row < 0 || row >= maze.length || col < 0 || col >= maze[0].length) {
             return false;
         }
+        // ¿Es un muro?
         if (maze[row][col].getState() == CellState.WALL) {
             return false;
         }
+        // ¿Ya fue visitada?
         return !visited[row][col];
     }
 
     /**
      * Reconstruye el camino desde la celda final hasta la inicial usando el mapa de padres.
-     * (Este método es idéntico al de BFS)
      */
     private List<Cell> reconstructPath(Map<Cell, Cell> parentMap, Cell start, Cell end) {
         LinkedList<Cell> path = new LinkedList<>();
@@ -103,4 +104,3 @@ public class MazeSolverDFS implements MazeSolver {
         return Collections.emptyList();
     }
 }
-MazeSolverRecursivo.java
