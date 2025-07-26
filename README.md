@@ -161,7 +161,7 @@ Desde la perspectiva del desarrollo, la arquitectura MVC fue crucial para gestio
 - **Implementar Algoritmo A***:  Añadir el algoritmo A* (A-Star), que usa heurísticas para encontrar la ruta más corta de forma mucho más eficiente que BFS en laberintos grandes.
 
 ## 🚀 Instrucciones de Uso
-1. Clonar el repositorio: ``git clone [URL_DEL_REPOSITORIO]``
+1. Clonar el repositorio: ``git clone https://github.com/SebastianY2007/icc-est-ProyectoFinal``
 
 2. Abrir el proyecto en un IDE compatible con Maven (IntelliJ IDEA o VS Code con el "Extension Pack for Java").
 
